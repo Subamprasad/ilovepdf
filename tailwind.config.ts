@@ -16,11 +16,11 @@ const config: Config = {
         pine: "#165b47"
       },
       boxShadow: {
-        card: "0 18px 50px rgba(17, 17, 17, 0.08)"
+        card: "0 18px 60px rgba(22, 36, 58, 0.14)"
       },
       fontFamily: {
-        display: ["Georgia", "serif"],
-        body: ["Arial", "Helvetica", "sans-serif"]
+        display: ["Sora", "Avenir Next", "Segoe UI", "sans-serif"],
+        body: ["Manrope", "Avenir Next", "Segoe UI", "sans-serif"]
       }
     }
   },
