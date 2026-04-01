@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
+import { PasswordUnlockForm } from "@/components/password-unlock-form";
+import { recordClick } from "@/lib/analytics";
 import { db } from "@/lib/db";
-import { getClientIp, hashValue } from "@/lib/security";
 
 type RedirectPageProps = {
   params: Promise<{
@@ -26,33 +27,16 @@ export default async function RedirectPage({ params }: RedirectPageProps) {
     notFound();
   }
 
-  const requestHeaders = await headers();
-  const referrer = requestHeaders.get("referer");
-  const userAgent = requestHeaders.get("user-agent");
-  const ip = getClientIp(
-    new Request("http://localhost", {
-      headers: requestHeaders
-    })
-  );
+  if (link.passwordHash) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center px-6 py-12">
+        <PasswordUnlockForm shortCode={shortCode} />
+      </main>
+    );
+  }
 
-  await db.$transaction([
-    db.link.update({
-      where: { id: link.id },
-      data: {
-        clickCount: {
-          increment: 1
-        }
-      }
-    }),
-    db.clickEvent.create({
-      data: {
-        linkId: link.id,
-        referrer,
-        userAgent,
-        ipHash: ip ? hashValue(ip) : null
-      }
-    })
-  ]);
+  const requestHeaders = await headers();
+  await recordClick(link.id, requestHeaders);
 
   redirect(link.originalUrl as never);
 }

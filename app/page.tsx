@@ -19,23 +19,41 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <div className="rounded-3xl border border-ink/10 bg-white/75 p-5 shadow-sm">
-              <p className="text-sm font-semibold text-ink">Instant redirect</p>
+              <div className="inline-flex rounded-xl bg-[#1d4ed8]/15 p-3 text-[#1d4ed8]">
+                <span aria-hidden className="text-xs font-bold tracking-wider">CL</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-ink">Custom Link</p>
               <p className="mt-2 text-sm leading-6 text-ink/65">
-                Fast code lookup and a clean redirect flow that is ready for caching later.
+                Pick your own alias so branded links stay clean, memorable, and easy to share.
               </p>
             </div>
             <div className="rounded-3xl border border-ink/10 bg-white/75 p-5 shadow-sm">
-              <p className="text-sm font-semibold text-ink">Secret manage link</p>
+              <div className="inline-flex rounded-xl bg-[#0f766e]/15 p-3 text-[#0f766e]">
+                <span aria-hidden className="text-xs font-bold tracking-wider">PP</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-ink">Password Protection</p>
               <p className="mt-2 text-sm leading-6 text-ink/65">
-                Each short URL gets a private management link so edits stay simple without user accounts.
+                Lock sensitive links with a password so only intended viewers can access them.
               </p>
             </div>
             <div className="rounded-3xl border border-ink/10 bg-white/75 p-5 shadow-sm">
-              <p className="text-sm font-semibold text-ink">Basic analytics</p>
+              <div className="inline-flex rounded-xl bg-[#7e22ce]/15 p-3 text-[#7e22ce]">
+                <span aria-hidden className="text-xs font-bold tracking-wider">EX</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-ink">Set Expiration</p>
               <p className="mt-2 text-sm leading-6 text-ink/65">
-                Track total clicks now and keep the event schema ready for deeper insights later.
+                Configure automatic expiry for campaign links, temporary offers, or private drops.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-ink/10 bg-white/75 p-5 shadow-sm">
+              <div className="inline-flex rounded-xl bg-[#b45309]/15 p-3 text-[#b45309]">
+                <span aria-hidden className="text-xs font-bold tracking-wider">QR</span>
+              </div>
+              <p className="mt-3 text-sm font-semibold text-ink">Generate QR Code</p>
+              <p className="mt-2 text-sm leading-6 text-ink/65">
+                Every short URL now includes a downloadable QR code for print, posters, and packaging.
               </p>
             </div>
           </div>

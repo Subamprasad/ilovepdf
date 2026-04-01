@@ -3,7 +3,16 @@ import { Prisma } from "@prisma/client";
 
 import { db } from "@/lib/db";
 import { assertRateLimit } from "@/lib/rate-limit";
-import { buildManageUrl, buildShortUrl, generateManageToken, generateShortCode, normalizeAlias, normalizeUrl } from "@/lib/urls";
+import {
+  buildManageUrl,
+  buildShortUrl,
+  generateManageToken,
+  generateShortCode,
+  normalizeAlias,
+  normalizeExpiresAt,
+  normalizePassword,
+  normalizeUrl
+} from "@/lib/urls";
 import { getClientIp, hashValue } from "@/lib/security";
 
 export async function POST(request: Request) {
@@ -14,6 +23,8 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       originalUrl?: string;
       customAlias?: string;
+      password?: string;
+      expiresAt?: string | null;
     };
 
     if (!body.originalUrl) {
@@ -28,6 +39,8 @@ export async function POST(request: Request) {
 
     const originalUrl = normalizeUrl(body.originalUrl);
     const customAlias = body.customAlias ? normalizeAlias(body.customAlias) : null;
+    const password = body.password ? normalizePassword(body.password) : null;
+    const expiresAt = normalizeExpiresAt(body.expiresAt);
     const shortCode = customAlias ?? generateShortCode();
     const manageToken = generateManageToken();
 
@@ -36,6 +49,8 @@ export async function POST(request: Request) {
         originalUrl,
         customAlias,
         shortCode,
+        passwordHash: password ? hashValue(password) : null,
+        expiresAt,
         manageTokenHash: hashValue(manageToken)
       }
     });
@@ -48,6 +63,8 @@ export async function POST(request: Request) {
         shortCode: createdLink.shortCode,
         shortUrl: buildShortUrl(createdLink.shortCode),
         manageUrl: buildManageUrl(manageToken),
+        expiresAt: createdLink.expiresAt?.toISOString() ?? null,
+        passwordProtected: Boolean(createdLink.passwordHash),
         createdAt: createdLink.createdAt.toISOString()
       }
     });

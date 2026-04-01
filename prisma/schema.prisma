@@ -13,6 +13,7 @@ model Link {
   shortCode       String      @unique
   customAlias     String?     @unique
   manageTokenHash String      @unique
+  passwordHash    String?
   isActive        Boolean     @default(true)
   expiresAt       DateTime?
   clickCount      Int         @default(0)

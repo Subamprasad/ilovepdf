@@ -7,6 +7,8 @@ export type CreateLinkResponse =
         shortCode: string;
         shortUrl: string;
         manageUrl: string;
+        expiresAt: string | null;
+        passwordProtected: boolean;
         createdAt: string;
       };
     }

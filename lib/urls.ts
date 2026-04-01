@@ -37,6 +37,42 @@ export function normalizeAlias(input: string) {
   return value;
 }
 
+export function normalizePassword(input: string) {
+  const value = input.trim();
+
+  if (!value) {
+    return null;
+  }
+
+  if (value.length < 6 || value.length > 128) {
+    throw new Error("Password must be 6-128 characters.");
+  }
+
+  return value;
+}
+
+export function normalizeExpiresAt(input: string | null | undefined) {
+  if (input === undefined) {
+    return undefined;
+  }
+
+  if (input === null || input.trim() === "") {
+    return null;
+  }
+
+  const parsed = new Date(input);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error("Expiration date is invalid.");
+  }
+
+  if (parsed <= new Date()) {
+    throw new Error("Expiration must be in the future.");
+  }
+
+  return parsed;
+}
+
 export function buildShortUrl(shortCode: string) {
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   return `${base.replace(/\/$/, "")}/${shortCode}`;

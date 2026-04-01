@@ -20,6 +20,7 @@ db.exec(`
     "shortCode" TEXT NOT NULL,
     "customAlias" TEXT,
     "manageTokenHash" TEXT NOT NULL,
+    "passwordHash" TEXT,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "expiresAt" DATETIME,
     "clickCount" INTEGER NOT NULL DEFAULT 0,
@@ -48,6 +49,13 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS "ClickEvent_linkId_clickedAt_idx" ON "ClickEvent"("linkId", "clickedAt");
 `);
+
+const linkColumns = db.prepare(`PRAGMA table_info("Link")`).all();
+const hasPasswordHashColumn = linkColumns.some((column) => column.name === "passwordHash");
+
+if (!hasPasswordHashColumn) {
+  db.exec(`ALTER TABLE "Link" ADD COLUMN "passwordHash" TEXT;`);
+}
 
 db.close();
 

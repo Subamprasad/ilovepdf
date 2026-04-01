@@ -45,6 +45,8 @@ export default async function ManagePage({ params }: ManagePageProps) {
           year: "numeric"
         })}
         isActive={link.isActive}
+        hasPassword={Boolean(link.passwordHash)}
+        initialExpiresAt={link.expiresAt ? link.expiresAt.toISOString().slice(0, 16) : ""}
       />
     </main>
   );

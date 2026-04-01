@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { hashValue } from "@/lib/security";
-import { normalizeUrl } from "@/lib/urls";
+import { normalizeExpiresAt, normalizePassword, normalizeUrl } from "@/lib/urls";
 
 type ManageRouteProps = {
   params: Promise<{
@@ -35,15 +35,38 @@ export async function PATCH(request: Request, context: ManageRouteProps) {
     const body = (await request.json()) as {
       originalUrl?: string;
       isActive?: boolean;
+      expiresAt?: string | null;
+      password?: string;
+      clearPassword?: boolean;
     };
 
+    if (body.clearPassword && body.password?.trim()) {
+      return NextResponse.json(
+        { ok: false, error: "Choose either a new password or remove password, not both." },
+        { status: 400 }
+      );
+    }
+
     const originalUrl = body.originalUrl ? normalizeUrl(body.originalUrl) : undefined;
+    const expiresAt = normalizeExpiresAt(body.expiresAt);
+    const normalizedPassword = body.password ? normalizePassword(body.password) : null;
+    let passwordHashUpdate: string | null | undefined;
+
+    if (body.clearPassword) {
+      passwordHashUpdate = null;
+    } else if (normalizedPassword) {
+      passwordHashUpdate = hashValue(normalizedPassword);
+    } else {
+      passwordHashUpdate = undefined;
+    }
 
     await db.link.update({
       where: { id: linkId },
       data: {
         originalUrl,
-        isActive: typeof body.isActive === "boolean" ? body.isActive : undefined
+        isActive: typeof body.isActive === "boolean" ? body.isActive : undefined,
+        expiresAt,
+        passwordHash: passwordHashUpdate
       }
     });
 

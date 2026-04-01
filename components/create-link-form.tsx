@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { CreateLinkResponse } from "@/lib/types";
 
@@ -9,9 +9,39 @@ type ResultState = Extract<CreateLinkResponse, { ok: true }>["data"] | null;
 export function CreateLinkForm() {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
+  const [password, setPassword] = useState("");
+  const [expiresAt, setExpiresAt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ResultState>(null);
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function generateQrCode() {
+      if (!result) {
+        setQrCodeDataUrl(null);
+        return;
+      }
+
+      const qrCode = await import("qrcode");
+      const dataUrl = await qrCode.toDataURL(result.shortUrl, {
+        width: 240,
+        margin: 1
+      });
+
+      if (isMounted) {
+        setQrCodeDataUrl(dataUrl);
+      }
+    }
+
+    void generateQrCode();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [result]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +56,9 @@ export function CreateLinkForm() {
         },
         body: JSON.stringify({
           originalUrl,
-          customAlias
+          customAlias,
+          password,
+          expiresAt: expiresAt || null
         })
       });
 
@@ -41,6 +73,8 @@ export function CreateLinkForm() {
       setResult(payload.data);
       setOriginalUrl("");
       setCustomAlias("");
+      setPassword("");
+      setExpiresAt("");
     } catch {
       setError("Something went wrong while creating the short link.");
       setResult(null);
@@ -89,6 +123,34 @@ export function CreateLinkForm() {
             />
           </div>
 
+          <div>
+            <label htmlFor="password" className="mb-2 block text-sm font-semibold text-ink/70">
+              Password protection (optional)
+            </label>
+            <input
+              id="password"
+              type="password"
+              minLength={6}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="At least 6 characters"
+              className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none transition focus:border-coral"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="expiresAt" className="mb-2 block text-sm font-semibold text-ink/70">
+              Expiration date (optional)
+            </label>
+            <input
+              id="expiresAt"
+              type="datetime-local"
+              value={expiresAt}
+              onChange={(event) => setExpiresAt(event.target.value)}
+              className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none transition focus:border-coral"
+            />
+          </div>
+
           <button
             type="submit"
             disabled={isSubmitting}
@@ -108,6 +170,14 @@ export function CreateLinkForm() {
       {result ? (
         <section className="rounded-[28px] border border-pine/15 bg-pine p-6 text-white shadow-card sm:p-8">
           <p className="text-sm uppercase tracking-[0.25em] text-white/70">Your short link is ready</p>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em]">
+            <span className="rounded-full bg-white/15 px-3 py-1 text-white/80">
+              {result.passwordProtected ? "Password protected" : "No password"}
+            </span>
+            <span className="rounded-full bg-white/15 px-3 py-1 text-white/80">
+              {result.expiresAt ? `Expires ${new Date(result.expiresAt).toLocaleString()}` : "No expiration"}
+            </span>
+          </div>
           <div className="mt-4 grid gap-4">
             <div className="rounded-2xl bg-white/10 p-4">
               <p className="text-xs uppercase tracking-[0.2em] text-white/60">Short URL</p>
@@ -138,6 +208,31 @@ export function CreateLinkForm() {
               <p className="mt-3 text-sm text-white/70">
                 Save this private manage link now. It is the only way to edit or disable the short URL later.
               </p>
+            </div>
+
+            <div className="rounded-2xl bg-white/10 p-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-white/60">QR Code</p>
+              <div className="mt-3 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-xl bg-white p-2">
+                  {qrCodeDataUrl ? (
+                    <img src={qrCodeDataUrl} alt="QR code for short URL" width={160} height={160} />
+                  ) : (
+                    <div className="h-40 w-40 animate-pulse rounded-lg bg-sand/70" />
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <p className="text-sm text-white/80">Scan or share this QR for quick access.</p>
+                  {qrCodeDataUrl ? (
+                    <a
+                      href={qrCodeDataUrl}
+                      download={`${result.shortCode}-qr.png`}
+                      className="inline-flex rounded-xl bg-white px-4 py-2 text-sm font-semibold text-pine transition hover:bg-sand"
+                    >
+                      Download PNG
+                    </a>
+                  ) : null}
+                </div>
+              </div>
             </div>
           </div>
         </section>

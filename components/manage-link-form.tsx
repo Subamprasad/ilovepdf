@@ -9,6 +9,8 @@ type ManageLinkFormProps = {
   clickCount: number;
   createdAt: string;
   isActive: boolean;
+  hasPassword: boolean;
+  initialExpiresAt: string;
 };
 
 export function ManageLinkForm({
@@ -17,10 +19,16 @@ export function ManageLinkForm({
   shortUrl,
   clickCount,
   createdAt,
-  isActive
+  isActive,
+  hasPassword,
+  initialExpiresAt
 }: ManageLinkFormProps) {
   const [originalUrl, setOriginalUrl] = useState(initialOriginalUrl);
   const [active, setActive] = useState(isActive);
+  const [expiresAt, setExpiresAt] = useState(initialExpiresAt);
+  const [newPassword, setNewPassword] = useState("");
+  const [removePassword, setRemovePassword] = useState(false);
+  const [passwordEnabled, setPasswordEnabled] = useState(hasPassword);
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +46,10 @@ export function ManageLinkForm({
         },
         body: JSON.stringify({
           originalUrl,
-          isActive: active
+          isActive: active,
+          expiresAt: expiresAt || null,
+          password: newPassword || undefined,
+          clearPassword: removePassword
         })
       });
 
@@ -50,6 +61,13 @@ export function ManageLinkForm({
       }
 
       setMessage("Changes saved.");
+      if (removePassword) {
+        setPasswordEnabled(false);
+      } else if (newPassword.trim()) {
+        setPasswordEnabled(true);
+      }
+      setRemovePassword(false);
+      setNewPassword("");
     } catch {
       setError("Unable to save your changes.");
     } finally {
@@ -122,6 +140,56 @@ export function ManageLinkForm({
         />
         Keep this short link active
       </label>
+
+      <div>
+        <label htmlFor="manage-expires-at" className="mb-2 block text-sm font-semibold text-ink/70">
+          Expiration date (optional)
+        </label>
+        <input
+          id="manage-expires-at"
+          type="datetime-local"
+          value={expiresAt}
+          onChange={(event) => setExpiresAt(event.target.value)}
+          className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-4 text-base text-ink outline-none transition focus:border-coral"
+        />
+      </div>
+
+      <div className="space-y-3 rounded-2xl border border-ink/10 px-4 py-4">
+        <p className="text-sm font-semibold text-ink">
+          Password protection: <span className="text-ink/70">{passwordEnabled ? "Enabled" : "Disabled"}</span>
+        </p>
+        <label htmlFor="manage-password" className="block text-sm font-semibold text-ink/70">
+          Set new password (optional)
+        </label>
+        <input
+          id="manage-password"
+          type="password"
+          minLength={6}
+          value={newPassword}
+          onChange={(event) => {
+            setNewPassword(event.target.value);
+            if (event.target.value.trim()) {
+              setRemovePassword(false);
+            }
+          }}
+          placeholder="Leave empty to keep current setting"
+          className="w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-base text-ink outline-none transition focus:border-coral"
+        />
+        <label className="flex items-center gap-3 text-sm text-ink">
+          <input
+            type="checkbox"
+            checked={removePassword}
+            onChange={(event) => {
+              setRemovePassword(event.target.checked);
+              if (event.target.checked) {
+                setNewPassword("");
+              }
+            }}
+            className="h-4 w-4 rounded border-ink/20 text-coral focus:ring-coral"
+          />
+          Remove password protection
+        </label>
+      </div>
 
       {message ? <p className="rounded-2xl bg-pine/10 px-4 py-3 text-sm text-pine">{message}</p> : null}
       {error ? <p className="rounded-2xl bg-coral/10 px-4 py-3 text-sm text-coral">{error}</p> : null}
