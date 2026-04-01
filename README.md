@@ -1,6 +1,7 @@
 # Briefly
 
 Anonymous URL shortener built with Next.js, TypeScript, Tailwind CSS, Prisma, and SQLite.
+try this https://url-shoter-link.netlify.app/
 
 ## Features
 
