@@ -1,70 +1,98 @@
-# Briefly
+# Finance Dashboard UI
 
-Anonymous URL shortener built with Next.js, TypeScript, Tailwind CSS, Prisma, and SQLite.
-try this https://url-shoter-link.netlify.app/
+This is a frontend assignment project.  
+It shows a clean finance dashboard where users can check balance, see transactions, and understand spending.
 
-Live URL: https://url-shoter-link.netlify.app/
+## What I Used
 
-## Features
-
-- Create short URLs without creating an account
-- Optional custom alias
-- Optional password protection
-- Optional expiration date/time
-- Optional downloadable QR code
-- Private manage URL shown once after link creation
-- Edit destination URL later from the private manage page
-- Disable or delete links
-- Basic click counting and click event storage
-
-## Stack
-
-- Next.js App Router
-- TypeScript
+- Next.js (React framework)
+- React + TypeScript
 - Tailwind CSS
-- Prisma ORM
-- SQLite storage (local file in development, `/tmp` fallback on Netlify)
+- Mock transaction data (no backend required)
+- `localStorage` for saving data in browser
 
-## Getting Started
+## How I Used These
 
-1. Copy `.env.example` to `.env`
-2. Install dependencies with `npm install`
-3. Generate Prisma client with `npm run prisma:generate`
-4. Create the local SQLite database with `npm run db:init`
-5. Start the app with `npm run dev`.
+- Next.js to build the app pages and structure.
+- React components to split UI into small reusable parts like cards, charts, insights, and transaction table.
+- TypeScript to keep data safe and avoid mistakes in transaction objects and filters.
+- Tailwind CSS to create a responsive and clean design quickly.
+- Mock data to simulate real finance activity (income and expense).
+- `useReducer` to manage app state:
+  - transactions
+  - selected role
+  - filters and sorting
+  - edit mode for transaction form
+- `localStorage` to keep user role and transaction changes after page refresh.
 
-## Environment Variables
+## Features Included
 
-- `DATABASE_URL`: Prisma connection string (optional locally, defaults to `file:./dev.db`)
-- `NEXT_PUBLIC_APP_URL`: public app base URL (optional; API falls back to request origin)
-- `REDIS_URL`: reserved for future distributed rate limiting
+### Dashboard Overview
 
-## Netlify Deployment
+- Total Balance card
+- Total Income card
+- Total Expenses card
+- Monthly balance trend chart (time-based)
+- Spending breakdown by category (category-based)
 
-This repo now includes a `netlify.toml` with:
+### Transactions Section
 
-- `build.command = "npm run build"`
-- `NODE_VERSION = "20"`
-- `DATABASE_URL = "file:/tmp/url-shortener.db"` for serverless runtime compatibility
+- Transaction table with:
+  - Date
+  - Description
+  - Category
+  - Type (income/expense)
+  - Amount
+- Search support
+- Filter by type
+- Filter by category
+- Sort by date or amount
 
-### Deploy steps
+### Role-Based UI (Frontend Simulation)
 
-1. Push this repo to GitHub.
-2. In Netlify, create a new site from the repository.
-3. Keep the default build command (`npm run build`).
-4. (Recommended) Add `NEXT_PUBLIC_APP_URL` in Netlify env vars to your site domain.
-5. Deploy.
+- Viewer role: can only see data
+- Admin role: can add and edit transactions
 
-## Notes
+### Insights Section
 
-- The app auto-initializes SQLite tables at runtime when using a `file:` database URL.
-- Netlify serverless file storage (`/tmp`) is ephemeral; data can reset across cold starts/redeploys.
-- For durable production data, move to PostgreSQL and set `DATABASE_URL` to your external database.
+- Highest spending category
+- Month-to-month expense comparison
+- Savings rate observation
 
-## Next Steps
+### UI/UX
 
-- Replace the in-memory rate limiter with Redis
-- Move from SQLite to PostgreSQL for production
-- Add QR code generation
-- Add abuse detection and blocked domain checks
-- Add richer analytics charts
+- Works on desktop, tablet, and mobile
+- Handles empty data and no-result filter states
+- Simple animations for smooth feel
+
+## Project Structure
+
+- `app/page.tsx` -> main dashboard page
+- `components/finance/finance-dashboard.tsx` -> main state and page flow
+- `components/finance/summary-cards.tsx` -> top summary cards
+- `components/finance/balance-trend-chart.tsx` -> trend chart
+- `components/finance/spending-breakdown.tsx` -> category spending bars
+- `components/finance/insights-panel.tsx` -> insights section
+- `lib/finance.ts` -> types, mock data, helper functions
+
+## Run This Project
+
+1. Install packages:
+   `npm install`
+2. Run development server:
+   `npm run dev`
+3. Open in browser:
+   `http://localhost:3000`
+
+### Build for production
+
+`npm run build`
+
+### Type check
+
+`npm run lint`
+
+## Important Note
+
+This project is made for UI evaluation and frontend logic demonstration.  
+No backend or database is required.

@@ -4,6 +4,11 @@
 
 :root {
   color-scheme: light;
+  --page-bg:
+    radial-gradient(circle at 12% 14%, rgba(16, 185, 129, 0.18), transparent 28%),
+    radial-gradient(circle at 86% 10%, rgba(251, 146, 60, 0.22), transparent 30%),
+    radial-gradient(circle at 48% 88%, rgba(14, 165, 233, 0.14), transparent 40%),
+    linear-gradient(165deg, #f6f8fb 0%, #f7fafc 45%, #eef3fb 100%);
 }
 
 html {
@@ -13,11 +18,8 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 10% 12%, rgba(56, 189, 248, 0.2), transparent 28%),
-    radial-gradient(circle at 85% 8%, rgba(251, 191, 36, 0.18), transparent 30%),
-    linear-gradient(180deg, #f6fbff 0%, #ecf4ff 45%, #f4efe8 100%);
-  color: #1f2c3f;
+  background: var(--page-bg);
+  color: #0f172a;
 }
 
 a {
@@ -30,5 +32,20 @@ a {
 }
 
 ::selection {
-  background: rgba(234, 90, 71, 0.2);
+  background: rgba(16, 185, 129, 0.24);
+}
+
+@keyframes rise {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 500ms ease-out both;
 }

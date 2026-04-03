@@ -19,8 +19,8 @@ const config: Config = {
         card: "0 18px 60px rgba(22, 36, 58, 0.14)"
       },
       fontFamily: {
-        display: ["Sora", "Avenir Next", "Segoe UI", "sans-serif"],
-        body: ["Manrope", "Avenir Next", "Segoe UI", "sans-serif"]
+        display: ["var(--font-display)", "Avenir Next", "Segoe UI", "sans-serif"],
+        body: ["var(--font-body)", "Avenir Next", "Segoe UI", "sans-serif"]
       }
     }
   },
