@@ -92,6 +92,18 @@ It shows a clean finance dashboard where users can check balance, see transactio
 
 `npm run lint`
 
+## Deploy on Netlify (Live)
+
+1. Push this code to GitHub.
+2. In Netlify, click **Add new site** -> **Import an existing project**.
+3. Select your GitHub repo: `Subamprasad/finance-dashboard-UI`.
+4. Netlify build settings:
+   - Build command: `npm run build`
+   - Publish directory: `out`
+5. Click **Deploy site**.
+
+After deploy, Netlify will give you a live URL.
+
 ## Important Note
 
 This project is made for UI evaluation and frontend logic demonstration.  
