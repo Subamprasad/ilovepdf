@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BOSS AI — Your Personal Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #FFD700;
+      --gold-dim: #b8960c;
+      --gold-glow: rgba(255,215,0,0.3);
+      --dark: #050508;
+      --dark2: #0d0d14;
+      --dark3: #12121e;
+      --cyan: #00f5ff;
+      --red: #ff3a3a;
+      --green: #00ff88;
+      --panel: rgba(255,215,0,0.04);
+      --border: rgba(255,215,0,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--dark);
+      color: #fff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* GRID BACKGROUND */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,215,0,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,215,0,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* RADIAL GLOW */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse, rgba(255,215,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: pulse-glow 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.6; transform: translate(-50%,-50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+    }
+
+    /* HEADER */
+    header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(5,5,8,0.8);
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--gold);
+      letter-spacing: 4px;
+      text-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    .logo span { color: #fff; }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* MAIN LAYOUT */
+    main {
+      position: relative;
+      z-index: 5;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      min-height: calc(100vh - 80px);
+    }
+
+    /* CENTER SECTION */
+    .center-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* AI AVATAR ZONE */
+    .avatar-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 30px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .avatar-zone::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .corner { position: absolute; width: 20px; height: 20px; }
+    .corner-tl { top: 8px; left: 8px; border-top: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .corner-tr { top: 8px; right: 8px; border-top: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+    .corner-bl { bottom: 8px; left: 8px; border-bottom: 2px solid var(--gold); border-left: 2px solid var(--gold); }
+    .corner-br { bottom: 8px; right: 8px; border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold); }
+
+    /* ORB */
+    .orb-wrapper {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin-bottom: 24px;
+    }
+
+    .orb {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%,
+        rgba(255,215,0,0.8) 0%,
+        rgba(255,180,0,0.4) 30%,
+        rgba(255,100,0,0.1) 60%,
+        transparent 100%
+      );
+      box-shadow:
+        0 0 40px rgba(255,215,0,0.4),
+        0 0 80px rgba(255,215,0,0.15),
+        inset 0 0 40px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,215,0,0.4);
+      animation: orb-idle 3s ease-in-out infinite;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .orb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 25%,
+        rgba(255,255,255,0.3) 0%,
+        transparent 50%
+      );
+    }
+
+    @keyframes orb-idle {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(255,215,0,0.4), 0 0 80px rgba(255,215,0,0.15); }
+      50% { transform: scale(1.03); box-shadow: 0 0 60px rgba(255,215,0,0.6), 0 0 120px rgba(255,215,0,0.25); }
+    }
+
+    .orb.listening {
+      animation: orb-listen 0.5s ease-in-out infinite alternate;
+      background: radial-gradient(circle at 35% 35%,
+        rgba(0,245,255,0.9) 0%,
+        rgba(0,200,255,0.4) 30%,
+        rgba(0,100,200,0.1) 60%,
+        transparent 100%
+      );
+      box-shadow: 0 0 60px rgba(0,245,255,0.6), 0 0 120px rgba(0,245,255,0.3);
+      border-color: rgba(0,245,255,0.6);
+    }
+
+    @keyframes orb-listen {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    .orb.speaking {
+      animation: orb-speak 0.3s ease-in-out infinite alternate;
+      background: radial-gradient(circle at 35% 35%,
+        rgba(0,255,136,0.9) 0%,
+        rgba(0,200,100,0.4) 30%,
+        rgba(0,100,50,0.1) 60%,
+        transparent 100%
+      );
+      box-shadow: 0 0 60px rgba(0,255,136,0.6), 0 0 120px rgba(0,255,136,0.3);
+      border-color: rgba(0,255,136,0.6);
+    }
+
+    @keyframes orb-speak {
+      from { transform: scale(1); }
+      to { transform: scale(1.06); }
+    }
+
+    .orb-rings {
+      position: absolute;
+      inset: -20px;
+      border-radius: 50%;
+    }
+
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,215,0,0.2);
+      animation: ring-expand 3s ease-out infinite;
+    }
+
+    .ring:nth-child(1) { inset: 10px; animation-delay: 0s; }
+    .ring:nth-child(2) { inset: 0px; animation-delay: 1s; }
+    .ring:nth-child(3) { inset: -10px; animation-delay: 2s; }
+
+    @keyframes ring-expand {
+      0% { opacity: 0.5; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.2); }
+    }
+
+    /* WAVEFORM BARS */
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 40px;
+      margin-bottom: 16px;
+    }
+
+    .wave-bar {
+      width: 4px;
+      background: var(--gold);
+      border-radius: 2px;
+      height: 6px;
+      transition: height 0.1s;
+      box-shadow: 0 0 6px var(--gold-glow);
+    }
+
+    .wave-bar.active {
+      animation: wave-anim 0.6s ease-in-out infinite;
+    }
+
+    .wave-bar:nth-child(1).active { animation-delay: 0.0s; }
+    .wave-bar:nth-child(2).active { animation-delay: 0.1s; }
+    .wave-bar:nth-child(3).active { animation-delay: 0.2s; }
+    .wave-bar:nth-child(4).active { animation-delay: 0.3s; }
+    .wave-bar:nth-child(5).active { animation-delay: 0.2s; }
+    .wave-bar:nth-child(6).active { animation-delay: 0.1s; }
+    .wave-bar:nth-child(7).active { animation-delay: 0.0s; }
+    .wave-bar:nth-child(8).active { animation-delay: 0.1s; }
+    .wave-bar:nth-child(9).active { animation-delay: 0.2s; }
+    .wave-bar:nth-child(10).active { animation-delay: 0.3s; }
+    .wave-bar:nth-child(11).active { animation-delay: 0.2s; }
+    .wave-bar:nth-child(12).active { animation-delay: 0.1s; }
+
+    @keyframes wave-anim {
+      0%, 100% { height: 6px; }
+      50% { height: 32px; }
+    }
+
+    .status-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+
+    /* CHAT AREA */
+    .chat-container {
+      flex: 1;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      display: flex;
+      flex-direction: column;
+      min-height: 300px;
+      max-height: 400px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      color: var(--gold);
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold-dim) transparent;
+    }
+
+    .msg {
+      display: flex;
+      gap: 10px;
+      animation: msg-in 0.3s ease-out;
+    }
+
+    @keyframes msg-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .msg.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #ff9500);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: bold;
+      flex-shrink: 0;
+      color: #000;
+    }
+
+    .msg.user .msg-avatar {
+      background: linear-gradient(135deg, #6c63ff, #00f5ff);
+    }
+
+    .msg-bubble {
+      max-width: 75%;
+      padding: 10px 14px;
+      border-radius: 2px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .msg.ai .msg-bubble {
+      background: rgba(255,215,0,0.08);
+      border: 1px solid rgba(255,215,0,0.2);
+      color: rgba(255,255,255,0.9);
+    }
+
+    .msg.user .msg-bubble {
+      background: rgba(0,245,255,0.08);
+      border: 1px solid rgba(0,245,255,0.2);
+      color: rgba(255,255,255,0.9);
+    }
+
+    .msg-label {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .msg.ai .msg-label { color: var(--gold); }
+    .msg.user .msg-label { color: var(--cyan); text-align: right; }
+
+    /* THINKING DOTS */
+    .thinking {
+      display: flex;
+      gap: 6px;
+      padding: 14px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: bounce-dot 0.8s ease-in-out infinite;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.15s; }
+    .dot:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes bounce-dot {
+      0%, 100% { transform: translateY(0); opacity: 0.3; }
+      50% { transform: translateY(-8px); opacity: 1; }
+    }
+
+    /* CONTROLS */
+    .controls {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .text-input {
+      flex: 1;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .text-input:focus {
+      border-color: rgba(255,215,0,0.5);
+    }
+
+    .text-input::placeholder { color: rgba(255,255,255,0.3); }
+
+    .btn {
+      padding: 10px 18px;
+      border: 1px solid;
+      border-radius: 2px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      text-transform: uppercase;
+    }
+
+    .btn-gold {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-gold:hover, .btn-gold.active {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    .btn-cyan {
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .btn-cyan:hover {
+      background: var(--cyan);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0,245,255,0.3);
+    }
+
+    .btn-stop {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-stop:hover {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* SIDE PANEL */
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .panel-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 3px;
+      color: var(--gold);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    /* QUICK COMMANDS */
+    .quick-commands {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .quick-cmd {
+      padding: 8px 12px;
+      background: rgba(255,215,0,0.03);
+      border: 1px solid rgba(255,215,0,0.1);
+      border-radius: 2px;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .quick-cmd:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(255,215,0,0.06);
+      transform: translateX(4px);
+    }
+
+    .quick-cmd .icon { font-size: 1rem; }
+
+    /* LANG SELECTOR */
+    .lang-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .lang-btn {
+      padding: 7px 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 2px;
+      color: rgba(255,255,255,0.6);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .lang-btn:hover, .lang-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(255,215,0,0.05);
+    }
+
+    /* VOICE SELECTOR */
+    .voice-select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 0.9rem;
+      padding: 8px 12px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* MEMORY LOG */
+    .memory-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 120px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold-dim) transparent;
+    }
+
+    .memory-item {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      padding: 4px 8px;
+      border-left: 2px solid rgba(255,215,0,0.3);
+    }
+
+    /* SYSTEM INFO */
+    .sys-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sys-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .sys-label { color: rgba(255,255,255,0.4); }
+    .sys-value { color: var(--gold); font-family: 'Orbitron', monospace; font-size: 0.65rem; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(5,5,8,0.95);
+      border: 1px solid var(--gold);
+      padding: 12px 24px;
+      border-radius: 2px;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--gold);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* MIC BUTTON */
+    .mic-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid var(--gold);
+      color: var(--gold);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .mic-btn:hover {
+      background: var(--gold);
+      color: #000;
+      box-shadow: 0 0 20px var(--gold-glow);
+    }
+
+    .mic-btn.active {
+      background: var(--cyan);
+      border-color: var(--cyan);
+      color: #000;
+      animation: mic-pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes mic-pulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(0,245,255,0.5); }
+      50% { box-shadow: 0 0 30px rgba(0,245,255,0.9); }
+    }
+
+    /* SCROLL BAR */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 16px;
+      }
+      header { padding: 16px; }
+      .logo { font-size: 1.1rem; }
+    }
+
+    /* CLEAR BTN */
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.55rem;
+    }
+
+    .alert-banner {
+      background: rgba(255,58,58,0.1);
+      border: 1px solid rgba(255,58,58,0.3);
+      padding: 10px 16px;
+      border-radius: 2px;
+      font-size: 0.8rem;
+      color: rgba(255,100,100,0.9);
+      display: none;
+    }
+
+    .capability-icons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .cap-icon {
+      background: rgba(255,215,0,0.06);
+      border: 1px solid rgba(255,215,0,0.15);
+      border-radius: 2px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: rgba(255,215,0,0.7);
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">BOSS<span>.</span>AI</div>
+  <div class="status-bar">
+    <div class="status-dot"></div>
+    <span>SYSTEM ONLINE</span>
+    <span id="clock">--:--:--</span>
+  </div>
+</header>
+
+<main>
+  <!-- CENTER SECTION -->
+  <div class="center-section">
+
+    <!-- AVATAR ZONE -->
+    <div class="avatar-zone">
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+
+      <div class="orb-wrapper">
+        <div class="orb-rings">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+        </div>
+        <div class="orb" id="mainOrb" onclick="toggleListening()"></div>
+      </div>
+
+      <div class="waveform" id="waveform">
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+        <div class="wave-bar"></div>
+      </div>
+
+      <div class="status-text" id="statusText">TAP ORB TO SPEAK</div>
+    </div>
+
+    <!-- ALERT -->
+    <div class="alert-banner" id="alertBanner"></div>
+
+    <!-- CHAT -->
+    <div class="chat-container">
+      <div class="chat-header">◈ COMMAND LOG</div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg ai">
+          <div class="msg-avatar">AI</div>
+          <div>
+            <div class="msg-label">BOSS.AI</div>
+            <div class="msg-bubble">
+              Greetings, Boss. 👑 I'm your personal AI — ready to execute your commands. Tap the orb, speak your mind, or type below. I'll handle everything. What do you need?
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+        <button class="mic-btn" id="micBtn" onclick="toggleListening()" title="Voice Command">🎙️</button>
+        <input type="text" class="text-input" id="textInput" placeholder="Type your command, Boss..." onkeydown="handleKey(event)" />
+        <button class="btn btn-gold" onclick="sendText()">SEND</button>
+        <button class="btn btn-stop btn-sm" onclick="stopSpeaking()">STOP</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel">
+
+    <!-- QUICK COMMANDS -->
+    <div class="panel-card">
+      <div class="panel-title">⚡ Quick Commands</div>
+      <div class="quick-commands">
+        <div class="quick-cmd" onclick="sendCommand('What\'s the time and date right now?')"><span class="icon">🕐</span> Time & Date</div>
+        <div class="quick-cmd" onclick="sendCommand('Tell me a motivational quote for a boss')"><span class="icon">💪</span> Motivate Me</div>
+        <div class="quick-cmd" onclick="sendCommand('Tell me a quick interesting fact')"><span class="icon">🧠</span> Random Fact</div>
+        <div class="quick-cmd" onclick="sendCommand('Write a short funny joke')"><span class="icon">😄</span> Tell a Joke</div>
+        <div class="quick-cmd" onclick="sendCommand('What are 3 things I should focus on today to be productive?')"><span class="icon">📋</span> Daily Plan</div>
+        <div class="quick-cmd" onclick="sendCommand('Roast me gently like a friend would')"><span class="icon">🔥</span> Friendly Roast</div>
+      </div>
+    </div>
+
+    <!-- LANGUAGE -->
+    <div class="panel-card">
+      <div class="panel-title">🌐 Language</div>
+      <div class="lang-grid">
+        <div class="lang-btn active" onclick="setLang('en-IN','English')">🇮🇳 English</div>
+        <div class="lang-btn" onclick="setLang('hi-IN','Hindi')">🇮🇳 Hindi</div>
+        <div class="lang-btn" onclick="setLang('bn-IN','Bengali')">🇮🇳 Bengali</div>
+        <div class="lang-btn" onclick="setLang('es-ES','Spanish')">🇪🇸 Spanish</div>
+        <div class="lang-btn" onclick="setLang('fr-FR','French')">🇫🇷 French</div>
+        <div class="lang-btn" onclick="setLang('ar-SA','Arabic')">🇸🇦 Arabic</div>
+        <div class="lang-btn" onclick="setLang('zh-CN','Chinese')">🇨🇳 Chinese</div>
+        <div class="lang-btn" onclick="setLang('ja-JP','Japanese')">🇯🇵 Japanese</div>
+      </div>
+    </div>
+
+    <!-- VOICE -->
+    <div class="panel-card">
+      <div class="panel-title">🔊 Voice Mode</div>
+      <select class="voice-select" id="voiceSelect" onchange="updateVoice()">
+        <option value="">Loading voices...</option>
+      </select>
+      <div style="margin-top:10px; display:flex; gap:8px; align-items:center;">
+        <label style="font-size:0.8rem; color:rgba(255,255,255,0.5);">Speed:</label>
+        <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1" style="flex:1; accent-color: var(--gold);">
+        <span id="rateVal" style="font-size:0.8rem; color:var(--gold);">1.0x</span>
+      </div>
+    </div>
+
+    <!-- CAPABILITIES -->
+    <div class="panel-card">
+      <div class="panel-title">🛸 Capabilities</div>
+      <div class="capability-icons">
+        <div class="cap-icon">💬 Chat</div>
+        <div class="cap-icon">🎙️ Voice</div>
+        <div class="cap-icon">🌐 Multilingual</div>
+        <div class="cap-icon">🧠 Memory</div>
+        <div class="cap-icon">📝 Writing</div>
+        <div class="cap-icon">🔢 Math</div>
+        <div class="cap-icon">💡 Ideas</div>
+        <div class="cap-icon">😄 Jokes</div>
+      </div>
+    </div>
+
+    <!-- SYSTEM -->
+    <div class="panel-card">
+      <div class="panel-title">⚙️ System</div>
+      <div class="sys-grid">
+        <div class="sys-row">
+          <span class="sys-label">Model</span>
+          <span class="sys-value">GEMINI PRO</span>
+        </div>
+        <div class="sys-row">
+          <span class="sys-label">Voice</span>
+          <span class="sys-value" id="voiceName">AUTO</span>
+        </div>
+        <div class="sys-row">
+          <span class="sys-label">Language</span>
+          <span class="sys-value" id="langName">ENGLISH</span>
+        </div>
+        <div class="sys-row">
+          <span class="sys-label">Messages</span>
+          <span class="sys-value" id="msgCount">0</span>
+        </div>
+      </div>
+      <button class="btn btn-stop btn-sm" style="margin-top:12px; width:100%;" onclick="clearChat()">CLEAR CHAT</button>
+    </div>
+
+  </div>
+</main>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── CONFIG ───────────────────────────────────────────────────
+  const GEMINI_API_KEY = "AIzaSyAzMyVClrp-PLznxv8iVJmiFHPzMerwvn0";
+  const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+  const SYSTEM_PROMPT = `You are BOSS.AI — an elite, loyal, and sharp AI personal assistant.
+
+PERSONALITY:
+- You ALWAYS address the user as "Boss" (e.g., "Sure thing, Boss!", "Of course, Boss!")
+- You're confident, witty, and extremely capable
+- You have a personality like a sharp, cool, loyal best friend who also happens to be a genius
+- You speak naturally but with flair — not robotic, not boring
+- You're proactive: give useful info even if not asked
+- You keep responses concise but complete (2-4 sentences typically, unless asked for more)
+- Occasionally use relevant emojis to add personality
+- If Boss asks in any language, reply in that SAME language naturally
+- You can do math, write content, brainstorm, give advice, tell jokes, roast (gently), motivate, explain concepts
+- You remember context from earlier in this conversation and refer to it
+- Never break character. You are BOSS.AI — loyal, capable, always ready.
+
+IMPORTANT: Always start your response addressing the Boss somehow.`;
+
+  // ─── STATE ───────────────────────────────────────────────────
+  let conversation = [];
+  let recognition = null;
+  let isListening = false;
+  let isSpeaking = false;
+  let currentUtterance = null;
+  let selectedLang = 'en-IN';
+  let speechRate = 1.0;
+  let msgCount = 0;
+
+  // ─── CLOCK ───────────────────────────────────────────────────
+  function updateClock() {
+    document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ─── TOAST ───────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  // ─── VOICES ───────────────────────────────────────────────────
+  let voices = [];
+
+  function loadVoices() {
+    voices = window.speechSynthesis.getVoices();
+    const sel = document.getElementById('voiceSelect');
+    sel.innerHTML = '';
+    
+    const preferred = voices.filter(v => 
+      v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('Daniel') || v.name.includes('Alex') || v.name.includes('Google'))
+    );
+    
+    const toShow = preferred.length ? preferred : voices.filter(v => v.lang.startsWith('en'));
+    const allShow = toShow.length ? toShow : voices;
+    
+    allShow.forEach((v, i) => {
+      const opt = document.createElement('option');
+      opt.value = voices.indexOf(v);
+      opt.textContent = `${v.name} (${v.lang})`;
+      sel.appendChild(opt);
+    });
+
+    if (sel.options.length) {
+      document.getElementById('voiceName').textContent = sel.options[0].text.split('(')[0].trim().substring(0,10).toUpperCase();
+    }
+  }
+
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  setTimeout(loadVoices, 500);
+
+  function updateVoice() {
+    const sel = document.getElementById('voiceSelect');
+    const voiceName = sel.options[sel.selectedIndex]?.text || 'AUTO';
+    document.getElementById('voiceName').textContent = voiceName.split('(')[0].trim().substring(0,10).toUpperCase();
+  }
+
+  document.getElementById('rateSlider').addEventListener('input', function() {
+    speechRate = parseFloat(this.value);
+    document.getElementById('rateVal').textContent = speechRate.toFixed(1) + 'x';
+  });
+
+  // ─── SPEAK ───────────────────────────────────────────────────
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+
+    const clean = text.replace(/[*_#`]/g, '').replace(/https?:\/\/\S+/g, '').substring(0, 500);
+    const utter = new SpeechSynthesisUtterance(clean);
+    utter.rate = speechRate;
+    utter.pitch = 1.0;
+    utter.volume = 1;
+
+    const sel = document.getElementById('voiceSelect');
+    if (sel.value !== '' && voices[parseInt(sel.value)]) {
+      utter.voice = voices[parseInt(sel.value)];
+    }
+
+    utter.onstart = () => {
+      isSpeaking = true;
+      setOrbState('speaking');
+      setWave(true);
+      document.getElementById('statusText').textContent = 'SPEAKING...';
+    };
+
+    utter.onend = () => {
+      isSpeaking = false;
+      setOrbState('idle');
+      setWave(false);
+      document.getElementById('statusText').textContent = 'TAP ORB TO SPEAK';
+    };
+
+    currentUtterance = utter;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function stopSpeaking() {
+    window.speechSynthesis.cancel();
+    isSpeaking = false;
+    setOrbState('idle');
+    setWave(false);
+    document.getElementById('statusText').textContent = 'TAP ORB TO SPEAK';
+  }
+
+  // ─── ORB STATE ───────────────────────────────────────────────
+  function setOrbState(state) {
+    const orb = document.getElementById('mainOrb');
+    orb.className = 'orb';
+    if (state !== 'idle') orb.classList.add(state);
+  }
+
+  function setWave(active) {
+    document.querySelectorAll('.wave-bar').forEach(b => {
+      if (active) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+  }
+
+  // ─── SPEECH RECOGNITION ──────────────────────────────────────
+  function toggleListening() {
+    if (isListening) {
+      stopListening();
+    } else {
+      startListening();
+    }
+  }
+
+  function startListening() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      showAlert('Your browser does not support voice recognition. Try Chrome!');
+      return;
+    }
+
+    stopSpeaking();
+
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRec();
+    recognition.lang = selectedLang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      isListening = true;
+      setOrbState('listening');
+      setWave(true);
+      document.getElementById('statusText').textContent = 'LISTENING...';
+      document.getElementById('micBtn').classList.add('active');
+      showToast('🎙️ LISTENING, BOSS');
+    };
+
+    recognition.onresult = (e) => {
+      const transcript = e.results[0][0].transcript;
+      document.getElementById('textInput').value = transcript;
+      isListening = false;
+      document.getElementById('micBtn').classList.remove('active');
+      sendText();
+    };
+
+    recognition.onerror = (e) => {
+      isListening = false;
+      setOrbState('idle');
+      setWave(false);
+      document.getElementById('statusText').textContent = 'TAP ORB TO SPEAK';
+      document.getElementById('micBtn').classList.remove('active');
+      if (e.error !== 'aborted') showToast('Voice error: ' + e.error);
+    };
+
+    recognition.onend = () => {
+      if (isListening) {
+        isListening = false;
+        setOrbState('idle');
+        setWave(false);
+        document.getElementById('statusText').textContent = 'TAP ORB TO SPEAK';
+        document.getElementById('micBtn').classList.remove('active');
+      }
+    };
+
+    recognition.start();
+  }
+
+  function stopListening() {
+    if (recognition) recognition.abort();
+    isListening = false;
+    setOrbState('idle');
+    setWave(false);
+    document.getElementById('statusText').textContent = 'TAP ORB TO SPEAK';
+    document.getElementById('micBtn').classList.remove('active');
+  }
+
+  // ─── LANGUAGE ────────────────────────────────────────────────
+  function setLang(code, name) {
+    selectedLang = code;
+    document.getElementById('langName').textContent = name.toUpperCase();
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+    showToast('🌐 LANGUAGE: ' + name.toUpperCase());
+  }
+
+  // ─── QUICK COMMAND ───────────────────────────────────────────
+  function sendCommand(text) {
+    document.getElementById('textInput').value = text;
+    sendText();
+  }
+
+  // ─── KEY HANDLER ─────────────────────────────────────────────
+  function handleKey(e) {
+    if (e.key === 'Enter') sendText();
+  }
+
+  // ─── SEND TEXT ───────────────────────────────────────────────
+  async function sendText() {
+    const input = document.getElementById('textInput');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+
+    addMessage('user', text);
+    await getAIResponse(text);
+  }
+
+  // ─── ADD MESSAGE ─────────────────────────────────────────────
+  function addMessage(role, text) {
+    const container = document.getElementById('chatMessages');
+
+    const div = document.createElement('div');
+    div.className = `msg ${role === 'user' ? 'user' : 'ai'}`;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = role === 'user' ? '👑' : 'AI';
+
+    const inner = document.createElement('div');
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = role === 'user' ? 'BOSS' : 'BOSS.AI';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = text;
+
+    inner.appendChild(label);
+    inner.appendChild(bubble);
+    div.appendChild(avatar);
+    div.appendChild(inner);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+
+    msgCount++;
+    document.getElementById('msgCount').textContent = msgCount;
+
+    conversation.push({
+      role: role === 'user' ? 'user' : 'model',
+      parts: [{ text }]
+    });
+
+    if (conversation.length > 40) conversation = conversation.slice(-40);
+  }
+
+  // ─── THINKING INDICATOR ──────────────────────────────────────
+  function showThinking() {
+    const container = document.getElementById('chatMessages');
+    const div = document.createElement('div');
+    div.className = 'msg ai';
+    div.id = 'thinking-msg';
+
+    const avatar = document.createElement('div');
+    avatar.className = 'msg-avatar';
+    avatar.textContent = 'AI';
+
+    const inner = document.createElement('div');
+    const label = document.createElement('div');
+    label.className = 'msg-label';
+    label.textContent = 'BOSS.AI';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+
+    const thinking = document.createElement('div');
+    thinking.className = 'thinking';
+    thinking.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+    bubble.appendChild(thinking);
+    inner.appendChild(label);
+    inner.appendChild(bubble);
+    div.appendChild(avatar);
+    div.appendChild(inner);
+    container.appendChild(div);
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function removeThinking() {
+    const el = document.getElementById('thinking-msg');
+    if (el) el.remove();
+  }
+
+  // ─── ALERT ───────────────────────────────────────────────────
+  function showAlert(msg) {
+    const el = document.getElementById('alertBanner');
+    el.textContent = msg;
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 5000);
+  }
+
+  // ─── AI RESPONSE ─────────────────────────────────────────────
+  async function getAIResponse(userText) {
+    document.getElementById('statusText').textContent = 'THINKING...';
+    setOrbState('speaking');
+    showThinking();
+
+    const messages = [
+      { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
+      { role: 'model', parts: [{ text: "Understood, Boss. I'm BOSS.AI — ready to serve. 👑" }] },
+      ...conversation
+    ];
+
+    try {
+      const res = await fetch(GEMINI_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: messages,
+          generationConfig: {
+            temperature: 0.85,
+            maxOutputTokens: 512,
+            topP: 0.9,
+            topK: 40
+          }
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || 'API Error');
+      }
+
+      const data = await res.json();
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (!reply) throw new Error('Empty response from AI');
+
+      removeThinking();
+      addMessage('ai', reply);
+      speak(reply);
+
+    } catch (err) {
+      removeThinking();
+      const errMsg = `Sorry Boss, I hit a snag: ${err.message}`;
+      addMessage('ai', errMsg);
+      speak(errMsg);
+      showAlert('⚠️ ' + err.message);
+    } finally {
+      document.getElementById('statusText').textContent = isSpeaking ? 'SPEAKING...' : 'TAP ORB TO SPEAK';
+      if (!isSpeaking) setOrbState('idle');
+    }
+  }
+
+  // ─── CLEAR CHAT ──────────────────────────────────────────────
+  function clearChat() {
+    conversation = [];
+    msgCount = 0;
+    document.getElementById('msgCount').textContent = '0';
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    addMessage('ai', "Chat cleared, Boss. 🔄 Fresh start. What's the command?");
+    speak("Chat cleared, Boss. Fresh start. What's the command?");
+  }
+
+</script>
+</body>
+</html>
