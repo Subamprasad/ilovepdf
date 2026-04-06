@@ -14,9 +14,9 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "MoneyFlow Finance Dashboard",
+  title: "PDFSpark | iLovePDF Clone",
   description:
-    "Interactive finance dashboard UI with summary cards, visual analytics, transactions, role-based controls, and insights."
+    "A Next.js clone app inspired by iLovePDF with merge, split, rotate, and image-to-PDF tools."
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

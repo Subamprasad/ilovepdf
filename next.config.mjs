@@ -1,7 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  devIndicators: false,
-  output: "export"
+  devIndicators: false
 };
 
 export default nextConfig;
