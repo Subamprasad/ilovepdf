@@ -13,6 +13,11 @@ A Next.js app inspired by iLovePDF with a large tools catalog UI and working ser
 - Add Page Numbers
 - Crop PDF
 - JPG/PNG to PDF
+- PDF to JPG
+- Word to PDF (DOCX)
+- PDF to Word (text-focused DOCX)
+- HTML to PDF
+- Unlock PDF (rasterized output)
 
 ## Tech Stack
 
@@ -57,4 +62,4 @@ This repo is configured for Netlify + Next.js runtime.
 
 ## Notes
 
-- Some advanced conversions shown in iLovePDF screenshots (for example PDF to Word, OCR, Unlock with cryptographic workflows) are marked as coming soon and need additional engines/services.
+- OCR and advanced AI-heavy conversions are still future additions.

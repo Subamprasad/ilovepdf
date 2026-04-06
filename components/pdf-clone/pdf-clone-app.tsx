@@ -138,35 +138,50 @@ const TOOLS: ToolConfig[] = [
     title: "PDF to JPG",
     description: "Convert PDF pages into image files.",
     group: "Convert PDF",
-    status: "coming-soon"
+    status: "live",
+    endpoint: "/api/pdf/pdf-to-jpg",
+    cta: "Convert to JPG",
+    fallbackName: "pdf-pages-jpg.zip"
   },
   {
     key: "wordToPdf",
     title: "Word to PDF",
     description: "Convert DOCX files to PDF.",
     group: "Convert PDF",
-    status: "coming-soon"
+    status: "live",
+    endpoint: "/api/pdf/word-to-pdf",
+    cta: "Convert to PDF",
+    fallbackName: "word-to-pdf.pdf"
   },
   {
     key: "pdfToWord",
     title: "PDF to Word",
     description: "Convert PDFs to editable DOCX.",
     group: "Convert PDF",
-    status: "coming-soon"
+    status: "live",
+    endpoint: "/api/pdf/pdf-to-word",
+    cta: "Convert to DOCX",
+    fallbackName: "pdf-to-word.docx"
   },
   {
     key: "htmlToPdf",
     title: "HTML to PDF",
     description: "Generate PDFs from URLs or HTML.",
     group: "Convert PDF",
-    status: "coming-soon"
+    status: "live",
+    endpoint: "/api/pdf/html-to-pdf",
+    cta: "Generate PDF",
+    fallbackName: "html-to-pdf.pdf"
   },
   {
     key: "unlock",
     title: "Unlock PDF",
-    description: "Remove password protection with owner permission.",
+    description: "Unlock protected PDFs (rasterized output mode).",
     group: "PDF Security",
-    status: "coming-soon"
+    status: "live",
+    endpoint: "/api/pdf/unlock",
+    cta: "Unlock PDF",
+    fallbackName: "unlocked.pdf"
   }
 ];
 
@@ -735,6 +750,161 @@ export function PdfCloneApp() {
                   className="rounded-xl border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-red-600 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-red-700"
                 />
               </label>
+            )}
+
+            {activeTool.key === "pdfToJpg" && (
+              <>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">PDF file</span>
+                  <input
+                    name="file"
+                    type="file"
+                    required
+                    accept="application/pdf"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-red-600 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-red-700"
+                  />
+                </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="grid gap-2">
+                    <span className="text-sm font-medium text-slate-700">
+                      Pages (all or ranges)
+                    </span>
+                    <input
+                      name="ranges"
+                      type="text"
+                      defaultValue="all"
+                      placeholder="all or 1-3,6"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                    />
+                  </label>
+                  <label className="grid gap-2">
+                    <span className="text-sm font-medium text-slate-700">
+                      JPG quality (30-100)
+                    </span>
+                    <input
+                      name="quality"
+                      type="number"
+                      min="30"
+                      max="100"
+                      defaultValue="85"
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                    />
+                  </label>
+                </div>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    Password (optional)
+                  </span>
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Needed only for locked PDFs"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+              </>
+            )}
+
+            {activeTool.key === "wordToPdf" && (
+              <label className="grid gap-2">
+                <span className="text-sm font-medium text-slate-700">DOCX file</span>
+                <input
+                  name="file"
+                  type="file"
+                  required
+                  accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  className="rounded-xl border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-red-600 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-red-700"
+                />
+              </label>
+            )}
+
+            {activeTool.key === "pdfToWord" && (
+              <>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">PDF file</span>
+                  <input
+                    name="file"
+                    type="file"
+                    required
+                    accept="application/pdf"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-red-600 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-red-700"
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    Password (optional)
+                  </span>
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Needed only for locked PDFs"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+              </>
+            )}
+
+            {activeTool.key === "htmlToPdf" && (
+              <>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    URL (optional)
+                  </span>
+                  <input
+                    name="url"
+                    type="url"
+                    placeholder="https://example.com"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">
+                    HTML content (optional)
+                  </span>
+                  <textarea
+                    name="html"
+                    rows={8}
+                    placeholder="<h1>Hello</h1><p>Use this when URL is blocked or private.</p>"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">PDF title</span>
+                  <input
+                    name="title"
+                    type="text"
+                    defaultValue="HTML to PDF"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+              </>
+            )}
+
+            {activeTool.key === "unlock" && (
+              <>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">PDF file</span>
+                  <input
+                    name="file"
+                    type="file"
+                    required
+                    accept="application/pdf"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-red-600 file:px-3 file:py-2 file:font-semibold file:text-white hover:file:bg-red-700"
+                  />
+                </label>
+                <label className="grid gap-2">
+                  <span className="text-sm font-medium text-slate-700">Password</span>
+                  <input
+                    name="password"
+                    type="password"
+                    placeholder="Required for encrypted PDFs"
+                    className="rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none ring-red-500 focus:ring-2"
+                  />
+                </label>
+                <p className="text-xs text-slate-500">
+                  Unlock output is generated in raster mode for broad compatibility.
+                </p>
+              </>
             )}
 
             <button
